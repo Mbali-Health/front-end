@@ -6,6 +6,7 @@ import List from '@material-ui/core/List';
 
 import UserItem from '../../molecules/UserItem';
 
+import { PRACTITIONER_ID, PRACTIONER_ID } from '../../../utils/Constants.js'
 const styles = {
   List: {
     padding: 0,
@@ -36,32 +37,36 @@ const UserNotSelected = styled(ListItem)`
   }
 `;
 
-const UsersList = ({ classes }) => {
+const UsersList = ({ classes, chats, activeConvo, onSidebarItemClicked}) => {
   return (
     <UsersListWrapper>
       <UsersListItems>
         <List component="nav" className={classes.List}>
-          <UserSelected
-            button
-            onClick={() => console.log('clicked')}
-            className={classes.ListItem}
-          >
-            <UserItem />
-          </UserSelected>
-          <UserNotSelected
-            button
-            onClick={() => console.log('clicked')}
-            className={classes.ListItem}
-          >
-            <UserItem />
-          </UserNotSelected>
-          <UserNotSelected
-            button
-            onClick={() => console.log('clicked')}
-            className={classes.ListItem}
-          >
-            <UserItem />
-          </UserNotSelected>
+          {chats.map((chat, i) => {
+            const recentMsg = chat.messages.filter(it => it.from !== PRACTIONER_ID).pop()
+            if(chat._id === activeConvo) {
+              return <UserSelected key={i}
+              button
+              onClick={(e) => onSidebarItemClicked(chat._id)}
+              className={classes.ListItem}
+              >
+              <UserItem key={i} 
+                lastMessage={recentMsg.content.message}
+                date={recentMsg.sent_ts}
+                />
+              </UserSelected>
+            } else {
+
+          return <UserNotSelected key={i}
+          button
+          onClick={() => onSidebarItemClicked(chat._id)}
+          className={classes.ListItem}>
+          <UserItem 
+                lastMessage={recentMsg.content.message}
+                date={recentMsg.sent_ts}/>
+        </UserNotSelected>
+            }
+          })}
         </List>
       </UsersListItems>
     </UsersListWrapper>

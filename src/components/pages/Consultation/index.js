@@ -6,7 +6,7 @@ import DefaultLayout from '../../templates/DefaultLayout';
 import Messages from '../../organisms/Messages';
 import SideNav from '../../organisms/SideNav';
 import wsUtil from '../../../utils/webSocket';
-import { CONSULTATION_ID } from '../../../utils/Constants.js';
+import { CONSULTATION_ID, PRACTIONER_ID } from '../../../utils/Constants.js';
 
 const Layout = styled.div`
   display: flex;
@@ -23,26 +23,50 @@ const Consultation = ({}) => {
   };
 
   useEffect(() => {
+    fetch(`http://localhost:8081/consultation/${PRACTIONER_ID}`)
+    .then(data => data.json())
+    .then(data => {
+      data.forEach(consultation => {
+        setConsultations(prevConsultations => ({
+          ...prevConsultations,
+          [consultation._id]: consultation
+        }))
+      })
+    })
+    .catch(error => console.error(error)) 
+  }, [])
+
+  useEffect(() => {
     wsUtil.addMessageListener(socket, (data) => {
-      console.log('data', data);
       const { consultation, msg } = data;
       setConsultations((prevConsultations) => ({
         ...prevConsultations,
-        [consultation]: [...(prevConsultations[consultation] || []), msg],
+        [consultation]: {
+          ...prevConsultations[consultation],
+          messages: [ ...(prevConsultations[consultation].messages || []), msg]
+        }
       }));
     });
   }, []);
+  
+  const onSidebarItemClicked = consultationId => {
+    console.log('aaa', consultationId)
+    setActiveConsultation(consultationId);
+  }
 
   return (
     <>
       <CssBaseline />
       <DefaultLayout>
         <Layout>
-          <SideNav />
+          <SideNav
+            onClick={onSidebarItemClicked}
+            consultations={consultations}
+            activeConvo={activeConsultation}/>
           <Messages
             onMessageSubmit={onMessageSubmit}
             room={activeConsultation}
-            messages={consultations[activeConsultation]}
+            messages={(consultations[activeConsultation] || {messages: []}).messages}
           />
         </Layout>
       </DefaultLayout>

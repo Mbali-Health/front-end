@@ -32,17 +32,17 @@ const UserLastMessage = styled.p`
   width: 1000px;
 `;
 
-const UserItem = () => {
+const UserItem = ({name, lastMessage, lastMessageTs}) => {
   return (
     <User button>
       <Photo />
       <UserStatus>
-        <Moment calendar={calendarStringsUsers} date="01-28-2020" />
+        <Moment calendar={calendarStringsUsers} date={lastMessageTs} />
       </UserStatus>
-      <UserDetails>
-        <UserName>John Doe</UserName>
+    <UserDetails>
+        <UserName>{name}</UserName>
         <UserLastMessage>
-          This is a users last message This is a users last message
+          {lastMessage}
         </UserLastMessage>
       </UserDetails>
     </User>

@@ -82,12 +82,26 @@ const a11yProps = (index) => {
   };
 };
 
-const SideNav = ({ classes }) => {
-  const [value, setValue] = useState(0);
+const SideNav = ({ classes, consultations, activeConvo, onClick}) => {
+  const [activeTab, setActiveTab] = useState(0);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleChange = (event, newTab) => {
+    setActiveTab(newTab);
   };
+
+  const waitingRoomKeys = Object.keys(consultations || {}).filter(roomId => {
+    return !consultations[roomId].practitioner
+  })
+
+  const activeChats = []
+  const waitingRoomChats = []
+  Object.keys(consultations || {}).forEach(key =>{
+    if (waitingRoomKeys.includes(key)) {
+      waitingRoomChats.push(consultations[key])
+    } else {
+      activeChats.push(consultations[key])
+    }
+  })
 
   return (
     <aside className={classes.sideNav}>
@@ -95,22 +109,25 @@ const SideNav = ({ classes }) => {
       <div className={classes.root}>
         <AppBar position="static">
           <StyledTabs
-            value={value}
+            value={activeTab}
             onChange={handleChange}
             aria-label="messages toggle tab"
-            indicatorColor="primary"
-          >
+            indicatorColor="primary">
             <StyledTab label="Active Chat" {...a11yProps(0)} />
             <StyledTab label="Waiting Room" {...a11yProps(1)} />
           </StyledTabs>
         </AppBar>
-        <MessagePanel value={value} index={0}>
-          <UsersList />
+        <MessagePanel value={activeTab} index={0}>
+          <UsersList 
+            chats={activeChats} 
+            activeConvo={activeConvo}
+            onSidebarItemClicked={onClick}/>
         </MessagePanel>
-        <MessagePanel value={value} index={1}>
-          <ResultsWrapper>
-            <NoResults />
-          </ResultsWrapper>
+        <MessagePanel value={activeTab} index={1}>
+          <UsersList 
+            chats={waitingRoomChats}
+            activeConvo={activeConvo}
+            onSidebarItemClicked={onClick}/>
         </MessagePanel>
       </div>
     </aside>

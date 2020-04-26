@@ -29,7 +29,6 @@ const Messages = ({ messages, room, onMessageSubmit }) => {
       <MessageHeading />
       <MessagesBody>
         {(messages || []).map((message, id) => {
-          console.log('message', message);
           if (message.from === PRACTIONER_ID) {
             // TODO: Change Hardcode
             return (
@@ -45,7 +44,7 @@ const Messages = ({ messages, room, onMessageSubmit }) => {
                 key={id}
                 imageUrl={imgUrl}
                 message={message.content.message}
-                date={message.date}
+                date={message.sent_ts}
               />
             );
           }

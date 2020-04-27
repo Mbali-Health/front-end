@@ -23,10 +23,12 @@ const MessagesBody = styled.div`
 const imgUrl =
   'https://image.shutterstock.com/image-photo/german-shepherd-dog-on-forest-260nw-164440220.jpg';
 
-const Messages = ({ messages, room, onMessageSubmit }) => {
+const Messages = ({ consultation, room, onMessageSubmit }) => {
+  const {name, messages } = consultation
+  console.log(messages)
   return (
     <MessageContainer>
-      <MessageHeading />
+      <MessageHeading name={name}/>
       <MessagesBody>
         {(messages || []).map((message, id) => {
           if (message.from === PRACTIONER_ID) {

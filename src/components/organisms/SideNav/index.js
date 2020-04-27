@@ -10,6 +10,7 @@ import Box from '@material-ui/core/Box';
 import UsersList from '../UsersList';
 import SideNavHeading from '../../molecules/SideNavHeading';
 import styled from 'styled-components';
+import Consultation from '../../pages/Consultation';
 
 const styles = (theme) => ({
   sideNav: {
@@ -82,11 +83,11 @@ const a11yProps = (index) => {
   };
 };
 
-const SideNav = ({ classes, consultations, activeConvo, onClick}) => {
-  const [activeTab, setActiveTab] = useState(0);
+const SideNav = ({ classes, consultations, activeConvo, onClick, onTabChange, activeTab}) => {
+  // const [activeTab, setActiveTab] = useState(0);
 
   const handleChange = (event, newTab) => {
-    setActiveTab(newTab);
+    onTabChange(newTab);
   };
 
   const waitingRoomKeys = Object.keys(consultations || {}).filter(roomId => {

@@ -15,21 +15,56 @@ const Layout = styled.div`
 const socket = wsUtil.getSocket();
 
 const Consultation = ({}) => {
-  const [activeConsultation, setActiveConsultation] = useState(CONSULTATION_ID); // TODO: Change Hardcode
+  const [activeConsultation, setActiveConsultation] = useState(null); // TODO: Change Hardcode
   const [consultations, setConsultations] = useState({});
+  const [tab, setTab] = useState(1);
+
+
+  const onTabChange = (to) => {
+    setTab(to)
+  }
 
   const onMessageSubmit = (msg) => {
-    wsUtil.send(socket, activeConsultation, msg);
+    if(!consultations[activeConsultation].practitioner) {
+      fetch('http://localhost:8081/register/patient_practitioner', {
+        method: "POST",
+        body: JSON.stringify({
+          patient: consultations[activeConsultation].patient,
+          practitioner: PRACTIONER_ID}
+        ),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      })
+      .then(() => {
+        setConsultations(prevConsultations => ({
+            ...prevConsultations,
+            [activeConsultation]: {
+              ...prevConsultations[activeConsultation],
+              practitioner: PRACTIONER_ID
+            }
+          }))
+          setTab(0)
+        })
+      .then(() => wsUtil.send(socket, activeConsultation, msg))
+    } else {
+      wsUtil.send(socket, activeConsultation, msg);
+    }
   };
 
   useEffect(() => {
     fetch(`http://localhost:8081/consultation/${PRACTIONER_ID}`)
     .then(data => data.json())
     .then(data => {
-      data.forEach(consultation => {
+      data.forEach(consultationWrapper => {
+        const {patient, consultation } = consultationWrapper;
         setConsultations(prevConsultations => ({
           ...prevConsultations,
-          [consultation._id]: consultation
+          [consultation._id]: {
+            ...consultation,
+            name: `${patient.name.first_name} ${patient.name.last_name}`
+          }
         }))
       })
     })
@@ -50,7 +85,6 @@ const Consultation = ({}) => {
   }, []);
   
   const onSidebarItemClicked = consultationId => {
-    console.log('aaa', consultationId)
     setActiveConsultation(consultationId);
   }
 
@@ -60,14 +94,19 @@ const Consultation = ({}) => {
       <DefaultLayout>
         <Layout>
           <SideNav
+            activeTab={tab}
+            onTabChange={onTabChange}
             onClick={onSidebarItemClicked}
             consultations={consultations}
             activeConvo={activeConsultation}/>
-          <Messages
-            onMessageSubmit={onMessageSubmit}
-            room={activeConsultation}
-            messages={(consultations[activeConsultation] || {messages: []}).messages}
-          />
+          { activeConsultation ? 
+            <Messages
+              onMessageSubmit={onMessageSubmit}
+              room={activeConsultation}
+              consultation={(consultations[activeConsultation] || {name: '', messages: []})} />
+              :
+              <div/>
+          }
         </Layout>
       </DefaultLayout>
     </>

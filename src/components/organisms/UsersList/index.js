@@ -43,14 +43,16 @@ const UsersList = ({ classes, chats, activeConvo, onSidebarItemClicked}) => {
       <UsersListItems>
         <List component="nav" className={classes.List}>
           {chats.map((chat, i) => {
-            const recentMsg = chat.messages.filter(it => it.from !== PRACTIONER_ID).pop()
+            console.log(chat)
+            if (!chat.messages) return <div />
+            const recentMsg = chat.messages[chat.messages.length -1]
             if(chat._id === activeConvo) {
               return <UserSelected key={i}
               button
               onClick={(e) => onSidebarItemClicked(chat._id)}
-              className={classes.ListItem}
-              >
+              className={classes.ListItem} >
               <UserItem key={i} 
+              name={chat.name}
                 lastMessage={recentMsg.content.message}
                 date={recentMsg.sent_ts}
                 />
@@ -62,6 +64,7 @@ const UsersList = ({ classes, chats, activeConvo, onSidebarItemClicked}) => {
           onClick={() => onSidebarItemClicked(chat._id)}
           className={classes.ListItem}>
           <UserItem 
+              name={chat.name}
                 lastMessage={recentMsg.content.message}
                 date={recentMsg.sent_ts}/>
         </UserNotSelected>

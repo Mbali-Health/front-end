@@ -99,7 +99,7 @@ const ClearSearch = styled(Close)`
   }
 `;
 
-const MessageHeading = ({ classes }) => {
+const MessageHeading = ({ classes, name}) => {
   const [search, setSearch] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -129,7 +129,7 @@ const MessageHeading = ({ classes }) => {
     <Heading>
       <PhotoSmall />
       <UserName>
-        Mathias Angule
+        {name}
         <ActiveTime>
           <Moment calendar={calendarStringsHeader} date="04-23-2020" />
         </ActiveTime>
